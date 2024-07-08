@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <title>Budget Tracker</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        font-family: "Roboto", Arial, sans-serif;
+      }
+
+      .container {
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+      }
+      .balance {
+        padding: 30px 50px;
+        background-color: #018786;
+        color: white;
+        font-size: 18px;
+        border-radius: 5px;
+      }
+      .balance span {
+        font-weight: 700;
+      }
+      .main-action {
+        display: flex;
+        gap: 20px;
+      }
+      .main-action input {
+        padding: 10px;
+        font-size: 15px;
+        border: 1px solid #828282;
+        border-radius: 5px;
+      }
+      .main-action select {
+        font-size: 15px;
+        border: 1px solid #828282;
+        border-radius: 5px;
+        width: 100px;
+      }
+
+      .main-action select option {
+        font-size: 15px;
+      }
+      .main-action input[type="submit"] {
+        background-color: #03dac6;
+        color: black;
+        font-size: 15px;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .navbar {
+        display: flex;
+        padding: 20px 80px;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #6200ee;
+        color: white;
+      }
+      .navbar a {
+        color: white;
+        text-decoration: underline;
+        margin-left: 20px;
+      }
+      .profile {
+        display: flex;
+        align-items: center;
+      }
+      .profile img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 10px;
+      }
+      .categories {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        padding: 20px 50px;
+      }
+      .category {
+        padding: 20px 30px;
+        background-color: #3700b3;
+        color: white;
+        border-radius: 5px;
+      }
+      .category table {
+        margin-top: 20px;
+      }
+      .category table td {
+        padding: 10px;
+      }
+      .categoryRow {
+        padding: 10px 0;
+      }
+      .expenseType {
+        background-color: white;
+        color: #828282;
+        border-radius: 5px;
+        font-style: italic;
+        font-size: 10px;
+        padding: 5px;
+      }
+      .history {
+        text-align: center;
+      }
+      .history table {
+        padding: 20px 0;
+      }
+      .history td {
+        border: 1px solid black;
+        padding: 10px 20px;
+        text-align: center;
+      }
+      .history select {
+        font-size: 15px;
+        border: 1px solid #828282;
+        border-radius: 5px;
+        width: 100px;
+      }
+
+      .history select option {
+        font-size: 15px;
+      }
+      .history input {
+        padding: 10px;
+        font-size: 15px;
+        border: 1px solid #828282;
+        border-radius: 5px;
+      }
+      .history input[type="submit"] {
+        padding: 5px 10px;
+        background: #018786;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="navbar">
+      <div>
+        <h2>Budget Tracker App</h2>
+      </div>
+      <div class="profile">
+        <span class="profilePhoto"
+          ><img src="/<%= findUser.photo%>" alt="profile photo"
+        /></span>
+        <span class="name"><%= findUser.fullname %></span>
+        <span class="logout"><a href="/api/auth/logout">Logout</a></span>
+      </div>
+    </div>
+    <div class="container">
+      <div class="balance">Total Balance: <span>$<%= totalBalance%></span></div>
+      <div class="create">
+        <form action="/api/budgets/create" method="post" class="main-action">
+          <input
+            type="text"
+            name="category"
+            placeholder="Category name"
+            required
+          />
+          <select name="type">
+            <option value="expense">Expense</option>
+            <option value="income">Income</option>
+          </select>
+          <input
+            type="number"
+            name="amount"
+            placeholder="Enter amount"
+            required
+          />
+          <input type="submit" value="Create" required />
+        </form>
+      </div>
+
+  
+      <div class="categoriesBox">
+        <h1 style="text-align: center">Categories</h1>
+        <div class="categories">
+          <% if (Object.keys(groupedBudgets).length > 0) { %> <% for (let
+          category in groupedBudgets) { %>
+          <div class="category">
+            <h3><%= category %></h3>
+            <hr />
+            <div class="transactions">
+              <table>
+                <% groupedBudgets[category].transactions.forEach(transaction =>
+                { %>
+                <tr class="categoryRow">
+                  <td>
+                    <span class="expenseType"><%= transaction.type %></span>
+                  </td>
+                  <td>$<%= transaction.amount %></td>
+                  <td><%= transaction.time %></td>
+                </tr>
+                <% }) %>
+              </table>
+            </div>
+          </div>
+          <% } %> <% } else { %>
+          <p>No personal budgets found.</p>
+          <% } %>
+        </div>
+      </div>
+      <div class="history">
+        <h1>Transaction History</h1>
+        <table>
+          <tr>
+            <td>Time</td>
+            <td>Category</td>
+            <td>Type</td>
+            <td>Amount</td>
+            <td colspan="2">Action</td>
+          </tr>
+
+          <% personalBudget.forEach(el => { %>
+          <tr>
+            <form action="/api/budgets/edit/<%=el.id %>" method="post">
+              <td><%= el.time%></td>
+              <td>
+                <select name="category" id="">
+                  <option value="<%= el.category%>"><%= el.category%></option>
+                  <% for(i=0; i < categories.length; i++) { %>
+                  <% if(categories[i] != el.category) { %>
+                    <option value="<%= categories[i]%>"><%= categories[i]%></option>
+                  <% } %>
+                  <% } %>
+                </select>
+              </td>
+              <td>
+                <select name="type">
+                  <% if(el.type == 'expense') { %>
+                  <option value="<%= el.type %>"><%= el.type %></option>
+                  <option value="income">income</option>
+                  <% } else { %>
+                    <option value="<%= el.type %>"><%= el.type %></option>
+                  <option value="expense">expense</option>
+                  <% } %>
+                </select>
+              </td>
+              <td>
+                <input type="number" name="amount" value="<%=el.amount %>">
+              </td>
+              <td>
+                <input type="submit" value="Edit" />
+              </td>
+            </form>
+            <td>
+              <form action="/api/budgets/delete/<%=el.id%>" method="post">
+                <input type="submit" value="Delete" />
+              </form>
+            </td>
+          </tr>
+          <% }) %>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>
